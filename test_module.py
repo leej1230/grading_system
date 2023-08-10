@@ -35,7 +35,7 @@ class TestUtilFunctions(unittest.TestCase):
     def test_sid_graded_list(self):
         with mock.patch('pandas.read_csv') as mocked_read_csv:
             mocked_read_csv.return_value = pd.DataFrame(data)
-            res = utils.sid_ungraded_list()
+            res = utils.sid_graded_list()
         ans = [456]
         self.assertEqual(res, ans)
     

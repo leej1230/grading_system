@@ -32,7 +32,7 @@ def sid_ungraded_list():
 # Output: List of student ID
 def sid_graded_list():
     grade_csv = pd.read_csv('save.csv')
-    return grade_csv[grade_csv.score.isna()]['sid'].values.tolist()
+    return grade_csv[grade_csv.score.notna()]['sid'].values.tolist()
 
 # Updates score and comment of sid row provided on csv and saves
 # Input: sid(int), score(str), comment(str)
