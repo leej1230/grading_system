@@ -1,5 +1,9 @@
 import pandas as pd
+import shutil
+import fitz
 import os
+
+IMG_OUTPUT_DIR = 'page_cache'
 
 # Read all pdf under directory 'pdfs' and return dict
 # Input: None
@@ -43,3 +47,23 @@ def update_grade(sid:int, score:str, comment:str):
     grade_csv.loc[mask, 'score'] = str(score)
     grade_csv.loc[mask, 'comment'] = comment
     grade_csv.to_csv('save.csv', index=False)
+
+def convert_pdf_to_images(pdf_file_name):
+    if os.path.exists(IMG_OUTPUT_DIR):
+        shutil.rmtree(IMG_OUTPUT_DIR)
+    os.makedirs(IMG_OUTPUT_DIR)
+
+    try:
+        pdf_document = fitz.open(os.path.join('pdfs',pdf_file_name))
+    except Exception as _:
+        return False
+    
+    for page_num in range(pdf_document.page_count):
+        page = pdf_document.load_page(page_num)
+        pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
+        
+        image_path = os.path.join(IMG_OUTPUT_DIR, f'page_{page_num + 1}.png')
+        pix.save(image_path, 'png')
+    
+    pdf_document.close()
+    return True
