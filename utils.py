@@ -31,6 +31,32 @@ def sid_ungraded_list():
     grade_csv = pd.read_csv('save.csv')
     return grade_csv[grade_csv.score.isna()]['sid'].values.tolist()
 
+# Returns sid to grade next
+# Input: None
+# Output: SID that needs to be graded in string, if it doesn't exist, returns None
+def get_next_sid():
+    res = sid_ungraded_list()
+    if res:
+        return str(res[0])
+    return None
+
+# Return the file name from sid
+# Input: SID (str)
+# Output: PDF file name (str)
+def get_file(sid:str):
+    file_dict = load_pdf_list()
+    if sid not in file_dict:
+        return None
+    return file_dict[sid]
+
+# Return the tuple (sid, file name) that needs to be grade next
+# Input: None
+# Output: Tuple (sid (str), file (str))
+def get_sid_with_file():
+    sid = get_next_sid()
+    file = get_file(sid)
+    return (sid,file)
+
 # Returns list of sid that have been graded
 # Input: None
 # Output: List of student ID
