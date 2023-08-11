@@ -1,6 +1,7 @@
 from screeninfo import get_monitors
 import PySimpleGUI as sg
 import utils
+import sys
 import os
 
 # Choosing Theme
@@ -14,7 +15,18 @@ TEXT_FONT_SIZE = 20
 IMG_OUTPUT_DIR = 'page_cache'
 
 # Initialize
+current_sid,current_file = utils.get_sid_with_file()
+if not current_sid:
+    print('ERROR: You have completed grading!')
+    sys.exit()
+while not current_file:
+    utils.update_grade(current_sid, '0', 'FILE NOT EXIST')
+    current_sid,current_file = utils.get_sid_with_file()
+if not current_file:
+    print('ERROR: You have completed grading!')
+    sys.exit()
 
+utils.convert_pdf_to_images(current_file)
 image_filenames = utils.get_image_filenames()
 
 images_layout = [
