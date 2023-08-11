@@ -5,3 +5,4 @@ __pycache__/
 *$py.class
 .venv
 page_cache/
+icon.txt

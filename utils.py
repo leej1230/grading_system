@@ -33,6 +33,12 @@ def sid_ungraded_list():
     grade_csv = pd.read_csv('save.csv')
     return grade_csv[grade_csv.score.isna()]['sid'].values.tolist()
 
+# Returns number of students who haven't got graded
+# Input: None
+# Output: Number of ungraded students(int)
+def len_ungraded():
+    return len(sid_ungraded_list())
+
 # Returns sid to grade next
 # Input: None
 # Output: SID that needs to be graded in string, if it doesn't exist, returns None

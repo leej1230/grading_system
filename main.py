@@ -1,7 +1,10 @@
 from screeninfo import get_monitors
 import PySimpleGUI as sg
+import base64
 import utils
 import sys
+
+icon_base64 = base64.b64decode(open('icon.txt', "r").read())
 
 # Choosing Theme
 sg.theme('Dark Brown')
@@ -57,14 +60,14 @@ input_layout = [
 ]
 
 layout = [
-    [sg.Text('Hello World!!')],
+    [sg.Text(f'{utils.len_ungraded()} more reports to go!!', font=(None,TEXT_FONT_SIZE), key='-TITLE-')],
     # [image_elem],
     [sg.Column([[image_elem]], scrollable=True, vertical_scroll_only=True, size=(WINDOW_SIZE[0], int(WINDOW_SIZE[1] * 0.7)))],
     # [sg.Image(data=img, size=(WINDOW_SIZE[0], int(WINDOW_SIZE[1]*0.7)), key='-IMAGE-')],
     [sg.Frame('Input Grades', [input_layout], size=(WINDOW_SIZE[0],int(WINDOW_SIZE[1]*0.3)), font=(None,TEXT_FONT_SIZE))],
 ]
 
-window = sg.Window('Report Grader', layout, resizable=True, finalize=True, size=WINDOW_SIZE)
+window = sg.Window('Report Grader', layout, resizable=True, finalize=True, size=WINDOW_SIZE, icon=icon_base64)
 
 while True:
     event, values = window.read()
@@ -108,5 +111,6 @@ while True:
                     sg.popup(f'You have finish grading!')
                     sys.exit()
         window['-IMAGE-'].update(data=img, size=(WINDOW_SIZE[0], None))
+        window['-TITLE-'].update(f'{utils.len_ungraded()} more reports to go!!', font=(None,TEXT_FONT_SIZE))
 
 window.close()
