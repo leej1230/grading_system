@@ -1,7 +1,9 @@
+from PIL import Image,ImageTk
 import pandas as pd
 import shutil
 import fitz
 import os
+import io
 
 IMG_OUTPUT_DIR = 'page_cache'
 
@@ -67,9 +69,9 @@ def sid_graded_list():
 # Updates score and comment of sid row provided on csv and saves
 # Input: sid(int), score(str), comment(str)
 # Output: None
-def update_grade(sid:int, score:str, comment:str):
+def update_grade(sid:str, score:str, comment:str):
     grade_csv = pd.read_csv('save.csv')
-    mask = grade_csv['sid']==sid
+    mask = grade_csv['sid']==int(sid)
     grade_csv.loc[mask, 'score'] = str(score)
     grade_csv.loc[mask, 'comment'] = comment
     grade_csv.to_csv('save.csv', index=False)
@@ -77,7 +79,7 @@ def update_grade(sid:int, score:str, comment:str):
 # Converts pdf to images and saves
 # Input: pdf_file_name(string)
 # Output: boolean (True if pdf successfully converted)
-def convert_pdf_to_images(pdf_file_name):
+def convert_pdf_to_images(pdf_file_name, first=False):
     if os.path.exists(IMG_OUTPUT_DIR):
         shutil.rmtree(IMG_OUTPUT_DIR)
     os.makedirs(IMG_OUTPUT_DIR)
@@ -85,7 +87,7 @@ def convert_pdf_to_images(pdf_file_name):
     try:
         pdf_document = fitz.open(os.path.join('pdfs',pdf_file_name))
     except Exception as _:
-        return False
+        return None
     
     for page_num in range(pdf_document.page_count):
         page = pdf_document.load_page(page_num)
@@ -95,7 +97,30 @@ def convert_pdf_to_images(pdf_file_name):
         pix.save(image_path, 'png')
     
     pdf_document.close()
-    return True
+
+    # Stich Images
+    image_filenames = get_image_filenames()
+    images = [Image.open(os.path.join(IMG_OUTPUT_DIR, image)) for image in image_filenames]
+    total_width = max(image.width for image in images)
+    total_height = sum(image.height for image in images)
+
+    stitched_image = Image.new("RGB", (total_width, total_height), "white")
+    y_offset = 0
+    for image in images:
+        stitched_image.paste(image, (0, y_offset))
+        y_offset += image.height
+
+    output = os.path.join(IMG_OUTPUT_DIR, 'pages.png')
+    stitched_image.save(output)
+    img = Image.open(output)
+
+    if first:
+        bio = io.BytesIO()
+        img.save(bio, format="PNG")
+        del img
+        return bio.getvalue()
+
+    return ImageTk.PhotoImage(img)
 
 # Returns list of pngs in correct order
 # Input: None

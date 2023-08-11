@@ -2,7 +2,6 @@ from screeninfo import get_monitors
 import PySimpleGUI as sg
 import utils
 import sys
-import os
 
 # Choosing Theme
 sg.theme('Dark Brown')
@@ -22,17 +21,24 @@ if not current_sid:
 while not current_file:
     utils.update_grade(current_sid, '0', 'FILE NOT EXIST')
     current_sid,current_file = utils.get_sid_with_file()
-if not current_file:
-    print('ERROR: You have completed grading!')
-    sys.exit()
+    if not current_sid:
+        print('ERROR: You have completed grading!')
+        sys.exit()
 
-utils.convert_pdf_to_images(current_file)
-image_filenames = utils.get_image_filenames()
-
-images_layout = [
-    [sg.Image(filename=os.path.join(IMG_OUTPUT_DIR, image), size=(None, None))]
-    for image in image_filenames
-]
+img = utils.convert_pdf_to_images(current_file, first=True)
+while not img:
+    utils.update_grade(current_sid, '0', 'FILE CORRUPTED')
+    current_sid,current_file = utils.get_sid_with_file()
+    if not current_sid:
+        print('ERROR: You have completed grading!')
+        sys.exit()
+    while not current_file:
+        utils.update_grade(current_sid, '0', 'FILE NOT EXIST')
+        current_sid,current_file = utils.get_sid_with_file()
+        if not current_sid:
+            print('ERROR: You have completed grading!')
+            sys.exit()
+image_elem = sg.Image(data=img, size=(WINDOW_SIZE[0], None), key='-IMAGE-')
 
 score_layout = [
     [sg.Text('Score', font=(None,TEXT_FONT_SIZE))],
@@ -52,7 +58,9 @@ input_layout = [
 
 layout = [
     [sg.Text('Hello World!!')],
-    [sg.Column(images_layout, scrollable=True, vertical_scroll_only=True, size=(WINDOW_SIZE[0], int(WINDOW_SIZE[1]*0.7)))],
+    # [image_elem],
+    [sg.Column([[image_elem]], scrollable=True, vertical_scroll_only=True, size=(WINDOW_SIZE[0], int(WINDOW_SIZE[1] * 0.7)))],
+    # [sg.Image(data=img, size=(WINDOW_SIZE[0], int(WINDOW_SIZE[1]*0.7)), key='-IMAGE-')],
     [sg.Frame('Input Grades', [input_layout], size=(WINDOW_SIZE[0],int(WINDOW_SIZE[1]*0.3)), font=(None,TEXT_FONT_SIZE))],
 ]
 
@@ -64,8 +72,41 @@ while True:
     if event in (sg.WIN_CLOSED, 'Exit'):
         break
     elif event == 'Submit Score':
-        submitted_score = values['report_score']
-        submitted_comment = values['report_comment']
-        sg.popup(f'Score you submitted: {submitted_score}, Comment you submitted: {submitted_comment}')
+        # Retrieve score
+        submitted_score = '0' if not values['report_score'] else values['report_score']
+        submitted_comment = '' if not values['report_comment'] else values['report_comment']
+
+        # Record the score
+        utils.update_grade(current_sid, submitted_score, submitted_comment)
+
+        # Reset comment input
+        window['report_comment'].update('')
+
+        current_sid,current_file = utils.get_sid_with_file()
+
+        if not current_sid:
+            sg.popup(f'You have finish grading!')
+            sys.exit()
+        while not current_file:
+            utils.update_grade(current_sid, '0', 'FILE NOT EXIST')
+            current_sid,current_file = utils.get_sid_with_file()
+            if not current_sid:
+                sg.popup(f'You have finish grading!')
+                sys.exit()
+
+        img = utils.convert_pdf_to_images(current_file)
+        while not img:
+            utils.update_grade(current_sid, '0', 'FILE CORRUPTED')
+            current_sid,current_file = utils.get_sid_with_file()
+            if not current_sid:
+                sg.popup(f'You have finish grading!')
+                sys.exit()
+            while not current_file:
+                utils.update_grade(current_sid, '0', 'FILE NOT EXIST')
+                current_sid,current_file = utils.get_sid_with_file()
+                if not current_sid:
+                    sg.popup(f'You have finish grading!')
+                    sys.exit()
+        window['-IMAGE-'].update(data=img, size=(WINDOW_SIZE[0], None))
 
 window.close()
