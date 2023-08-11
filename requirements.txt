@@ -3,6 +3,8 @@ iniconfig==2.0.0
 numpy==1.25.2
 packaging==23.1
 pandas==2.0.3
+Pillow==10.0.0
+Pillow-PIL==0.1.dev0
 pluggy==1.2.0
 PyMuPDF==1.22.5
 pyobjc-core==9.2; sys_platform == 'darwin'
