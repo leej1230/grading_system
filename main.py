@@ -32,6 +32,7 @@ img = utils.convert_pdf_to_images(current_file, first=True)
 while not img:
     utils.update_grade(current_sid, '0', 'FILE CORRUPTED')
     current_sid,current_file = utils.get_sid_with_file()
+    img = utils.convert_pdf_to_images(current_file, first=True)
     if not current_sid:
         print('ERROR: You have completed grading!')
         sys.exit()
@@ -101,6 +102,7 @@ while True:
         while not img:
             utils.update_grade(current_sid, '0', 'FILE CORRUPTED')
             current_sid,current_file = utils.get_sid_with_file()
+            img = utils.convert_pdf_to_images(current_file)
             if not current_sid:
                 sg.popup(f'You have finish grading!')
                 sys.exit()
