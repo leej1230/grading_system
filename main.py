@@ -57,14 +57,12 @@ comment_layout = [
 input_layout = [
     sg.Column(score_layout),
     sg.Column(comment_layout),
-    sg.Button('Submit Score', font=(None,TEXT_FONT_SIZE))
+    sg.Button('Submit Score', font=(None,TEXT_FONT_SIZE), bind_return_key=True)
 ]
 
 layout = [
     [sg.Text(f'{utils.len_ungraded()} more reports to go!!', font=(None,TEXT_FONT_SIZE), key='-TITLE-')],
-    # [image_elem],
     [sg.Column([[image_elem]], scrollable=True, vertical_scroll_only=True, size=(WINDOW_SIZE[0], int(WINDOW_SIZE[1] * 0.7)))],
-    # [sg.Image(data=img, size=(WINDOW_SIZE[0], int(WINDOW_SIZE[1]*0.7)), key='-IMAGE-')],
     [sg.Frame('Input Grades', [input_layout], size=(WINDOW_SIZE[0],int(WINDOW_SIZE[1]*0.3)), font=(None,TEXT_FONT_SIZE))],
 ]
 
