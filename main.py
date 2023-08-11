@@ -1,63 +1,51 @@
 import PySimpleGUI as sg
+import utils
+import os
+from screeninfo import get_monitors
 
-frame_ratio = 3
+monitor = get_monitors()[0]
+WINDOW_SIZE = (monitor.width, monitor.height)
 
 sg.theme('Dark Brown')
+IMG_OUTPUT_DIR = 'page_cache'
 
-pdf_frame   = sg.Frame('',[], key='pdf_frame', size=(500, 700))
-grade_frame = sg.Frame('',[], key='grade_frame')
 
-# layout = [
-#     [pdf_frame],
-#     [grade_frame],
-#     [sg.Button('Exit')]
-# ]
+
+image_filenames = utils.get_image_filenames()
+
+images_layout = [
+    [sg.Image(filename=os.path.join(IMG_OUTPUT_DIR, image), size=(None, None))]
+    for image in image_filenames
+]
+
+score_layout = [
+    [sg.Text('Score')],
+    [sg.InputText(key='report_score')]
+]
+
+comment_layout = [
+    [sg.Text('Comment')],
+    [sg.InputText(key='report_comment')]
+]
+
+input_layout = [
+    sg.Column(score_layout),
+    sg.Column(comment_layout)
+]
 
 layout = [
     [sg.Text('Hello World!!')],
-    [sg.Column(
-        layout=[
-            [
-                sg.Frame("Frame 1", layout=[
-                    [sg.Text("Frame 1 content")],
-                    [sg.Input()]
-                ], expand_x=True, expand_y=True, key="-FRAME1-")  # Allow Frame 1 to expand vertically
-            ],
-            [
-                sg.Frame("Frame 2", layout=[
-                    [sg.Text("Frame 2 content")],
-                    [sg.Button("Button")]
-                ],expand_x=True, expand_y=True, key="-FRAME2-")  # Allow Frame 2 to expand vertically
-            ]
-        ],
-        expand_x=True,
-        expand_y=True,
-        key="-COLUMN-"
-    )],
+    [sg.Column(images_layout, scrollable=True, vertical_scroll_only=True, size=(WINDOW_SIZE[0], int(WINDOW_SIZE[1]*0.7)))],
+    [sg.Frame('Input Grades', [input_layout])],
     [sg.Button("Exit")]
 ]
 
-
-window = sg.Window('Report Grader', layout, resizable=True, finalize=True)
-
-# window["pdf_frame"].expand(expand_x=True)
-# window["grade_frame"].expand(expand_x=True)
+window = sg.Window('Report Grader', layout, resizable=True, finalize=True, size=WINDOW_SIZE)
 
 while True:
     event, values = window.read()
+
     if event in (sg.WIN_CLOSED, 'Exit'):
         break
-    # sg.theme(values['-LIST-'][0])
-    # entered_text = sg.popup_get_text('This is {}'.format(values['-LIST-'][0]))
-    # if entered_text:
-    #     sg.popup('You Entered {}!'.format(entered_text))
-    
-    window_size = window.get_size()
-    column_height = window_size[1]
-    frame1_height = column_height * (1 / (frame_ratio + 1))
-    frame2_height = column_height - frame1_height
-
-    window["-FRAME1-"].update(size=(None, frame1_height))
-    window["-FRAME2-"].update(size=(None, frame2_height))
 
 window.close()

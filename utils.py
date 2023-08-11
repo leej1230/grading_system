@@ -48,6 +48,9 @@ def update_grade(sid:int, score:str, comment:str):
     grade_csv.loc[mask, 'comment'] = comment
     grade_csv.to_csv('save.csv', index=False)
 
+# Converts pdf to images and saves
+# Input: pdf_file_name(string)
+# Output: boolean (True if pdf successfully converted)
 def convert_pdf_to_images(pdf_file_name):
     if os.path.exists(IMG_OUTPUT_DIR):
         shutil.rmtree(IMG_OUTPUT_DIR)
@@ -67,3 +70,9 @@ def convert_pdf_to_images(pdf_file_name):
     
     pdf_document.close()
     return True
+
+# Returns list of pngs in correct order
+# Input: None
+# Output: list of string
+def get_image_filenames():
+    return sorted([f for f in os.listdir(IMG_OUTPUT_DIR) if f.lower().endswith('.png')])

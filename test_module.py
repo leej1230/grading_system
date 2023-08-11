@@ -46,6 +46,12 @@ class TestUtilFunctions(unittest.TestCase):
                 utils.update_grade(123,'5','test')
 
         mocked_to_csv.assert_called_once_with('save.csv', index=False)
+    
+    def test_convert_pdf_to_images(self):
+        pass
+
+    def test_get_image_filenames(self):
+        pass
 
 if __name__ == '__main__':
     unittest.main()
